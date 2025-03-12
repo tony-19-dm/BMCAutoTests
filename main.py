@@ -15,7 +15,7 @@ def driver():
     
     service = Service()
     driver = webdriver.Chrome(service=service, options=options)
-    driver.get("https://localhost:2443")
+    
     yield driver
     driver.quit()
 
@@ -35,6 +35,7 @@ def logout_after_test(driver):
         print(f"Logout attempt failed: {str(e)}")
 
 def test_success_login(driver):
+    driver.get('https://localhost:2443/?next=/login#/login')
     wait = WebDriverWait(driver, 10)
     
     username = "root"
@@ -50,7 +51,7 @@ def test_success_login(driver):
     assert header.is_displayed()
 
 def test_failed_login(driver):
-    driver.get('https://localhost:2443/?next=/login#/')
+    driver.get('https://localhost:2443/?next=/login#/login')
     time.sleep(5)
     
     username = "root"
@@ -62,11 +63,12 @@ def test_failed_login(driver):
 
     time.sleep(5)
 
-    login_window = driver.find_element(By.CLASS_NAME, 'login-main')
-    assert login_window.is_displayed()
+    errorWindow = driver.find_element(By.CLASS_NAME, 'neterror')
+    
+    assert errorWindow.is_displayed()
 
 def test_ban_user(driver):
-    driver.get('https://localhost:2443/?next=/login#/')
+    driver.get('https://localhost:2443/?next=/login#/login')
     wait = WebDriverWait(driver, 10)
     
     # Правильные и неправильные пароли
@@ -102,5 +104,8 @@ def test_ban_user(driver):
     password.send_keys(banning_correct_password)
     login_btn.click()
 
-    login_window = driver.find_element(By.CLASS_NAME, 'login-main')
-    assert login_window.is_displayed()
+    time.sleep(3)
+
+    errorWindow = driver.find_element(By.CLASS_NAME, 'neterror')
+    
+    assert errorWindow.is_displayed()
