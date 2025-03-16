@@ -1,0 +1,8 @@
+2025-03-16 16:13:31,121 INFO Successful authentication
+2025-03-16 16:13:31,121 INFO Sending a GET request to https://localhost:2443/redfish/v1/Systems/system
+2025-03-16 16:13:31,435 INFO A response has been received. Status: 200
+2025-03-16 16:13:31,435 INFO [Power On] Sending POST to https://localhost:2443/redfish/v1/Systems/system/Actions/ComputerSystem.Reset
+2025-03-16 16:13:31,696 ERROR [Power On] Test failed: Expected 202 Accepted, got 204. Response: 
+assert 204 == 202
+ +  where 204 = <Response [204]>.status_code
+2025-03-16 16:13:31,795 INFO Session deleted
