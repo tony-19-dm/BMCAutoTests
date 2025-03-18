@@ -17,45 +17,26 @@ logger.addHandler(file_handler)
 def redfish_session():
     """Фикстура для аутентифицированной сессии Redfish"""
     session = requests.Session()
+    session.auth = (USERNAME, PASSWORD)
     session.verify = False
-
-    auth_url = f"https://{BMC_IP}/redfish/v1/SessionService/Sessions"
-    try:
-        response = session.post(
-            auth_url,
-            json={
-                "UserName": USERNAME,
-                "Password": PASSWORD
-            }
-        )
-
-        response.raise_for_status()
-        token = response.headers.get("X-Auth-Token")
-
-        if not token:
-            logger.error("The authentication token is missing")
-            pytest.fail("Токен аутентификации отсутствует")
-            
-        session.headers.update({"X-Auth-Token": token})
-        logger.info("Successful authentication")
-
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Authentication error: {e}")
-        pytest.fail(f"Не удалось создать сессию: {e}")
-
     yield session
-
-    session_id = response.json().get("Id")
-    if session_id:
-        try:
-            session.delete(f"{auth_url}/{session_id}")
-            logger.info("Session deleted")
-        except requests.exceptions.RequestException as e:
-            logger.warning(f"Session deletion error: {e}")
+    session.close()
 
 def test_authentication(redfish_session):
-    """Тест успешной аутентификации"""
-    assert redfish_session is not None, "Сессия не создана"
+    auth_url = f"https://{BMC_IP}/redfish/v1/SessionService/Sessions"
+    
+    response = redfish_session.post(
+        auth_url,
+        json={
+            "UserName": USERNAME,
+            "Password": PASSWORD
+        }
+    )
+
+    assert response.status_code == 201, "Authentication error" # При выполнении post запрса возвращает 201
+    session_info = response.json()
+    assert "@odata.id" in session_info, "The Session token field is missing in the response"
+    logger.info("The authentication test was completed successfuly")
 
 def test_system_info(redfish_session):
     """Тест получения информации о системе"""
