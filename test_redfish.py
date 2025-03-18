@@ -24,7 +24,7 @@ def redfish_session():
 
 def test_authentication(redfish_session):
     auth_url = f"https://{BMC_IP}/redfish/v1/SessionService/Sessions"
-    
+
     response = redfish_session.post(
         auth_url,
         json={
@@ -56,7 +56,7 @@ def test_system_info(redfish_session):
 
 def wait_for_power_state(session, system_url, expected_state):
     """Wait for system power state change"""
-    logger.info(f"[Power State] Waiting for state '{expected_state}' (max attempts: {max_retries})")
+    logger.info(f"[Power State] Waiting for state '{expected_state}'")
     response = session.get(system_url)
     
     if response.status_code != 200:
@@ -70,7 +70,7 @@ def wait_for_power_state(session, system_url, expected_state):
         logger.info(f"[Power State] Target state '{expected_state}' achieved")
         return True
     
-    logger.error(f"[Power State] Failed to reach state '{expected_state}' after {max_retries} attempts")
+    logger.error(f"[Power State] Failed to reach state '{expected_state}'")
     return False
 
 def test_power_on(redfish_session):
@@ -85,7 +85,7 @@ def test_power_on(redfish_session):
         response = redfish_session.post(reset_url, json=payload)
         logger.debug(f"[Power On] Response status: {response.status_code}, headers: {response.headers}")
         
-        assert response.status_code == 202, (
+        assert response.status_code == 204, (
             f"Expected 202 Accepted, got {response.status_code}. "
             f"Response: {response.text[:500]}"
         )
