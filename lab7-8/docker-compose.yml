@@ -5,9 +5,10 @@ services:
     ports:
       - "8080:8080"   # Jenkins веб-интерфейс
       - "50000:50000" # Агент-соединения
+      - "2443:2443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock # Доступ к Docker на хосте
-      - jenkins_home:/var/jenkins_home # Папка Jenkins для сохранения данных
+      # - jenkins_home:/var/jenkins_home # Папка Jenkins для сохранения данных
     environment:
       JENKINS_OPTS: "--httpPort=8080" # Настройка порта
     restart: always
@@ -15,3 +16,6 @@ services:
 volumes:
   jenkins_home:
     driver: local
+
+
+# qemu-system-arm -m 256 -M romulus-bmc -nographic -drive file=/romulus/obmc-phosphor-image-romulus-20250418213140.static.mtd,format=raw,if=mtd -net nic -net user,hostfwd=:0.0.0.0:2222-:22,hostfwd=:0.0.0.0:2443-:443,hostfwd=udp:0.0.0.0:2623-:623
