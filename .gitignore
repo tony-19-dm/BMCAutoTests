@@ -2,3 +2,4 @@ __pycache__/
 .pytest_cashe/
 env/
 /py_log.log
+.DS_Store
